@@ -7,15 +7,6 @@ import numpy
 from PIL import Image
 from PIL import ImageDraw
 
-""" The types of terrain in the map """
-TERRAIN_TYPES = [
-    "grass",
-    "sand",
-    "water",
-    "forest",
-    "low mountain",
-    "high mountain"
-]
 """ The RGB values of the colors for each terrain type """
 MAP_COLORS = {
     "grass": (115, 189, 63),
@@ -77,11 +68,44 @@ TRANSITION_MATRIX = {
         }
 }
 """ The width of the image to be generated in pixels """
-IMAGE_WIDTH = 1000
+IMAGE_WIDTH = 1400
 """ The height of the image to be generated in pixels """
-IMAGE_HEIGHT = 700
+IMAGE_HEIGHT = 900
 """ The length/height of each square of the grid in pixels """
 GRID_SIZE = 4
+
+class MapGenerator:
+    def __init__(self, transition_matrix):
+        self.transition_matrix = transition_matrix
+        self.terrain_types = list(transition_matrix)
+        self.current_terrain = self.get_first_terrain()
+    
+    def get_first_terrain(self):
+        """Chooses a random terrain type to start with. Returns the name of the terrain type as a string."""
+        first_terrain = numpy.random.choice(self.terrain_types)
+        return first_terrain
+    
+    def get_next_terrain(self):
+        """Chooses the next terrain type that will be drawn on the map based on the probablities provided by the transition matrix.
+           Returns the name as a string.
+           Args:
+                current_terrain (str): the name of the terrain type to be transitioned from
+        """
+        next_terrain = numpy.random.choice(self.terrain_types, p=self.get_probabilities(self.current_terrain))
+
+        self.current_terrain = next_terrain
+    
+    def get_probabilities(self, terrain):
+        """Returns a list of the probabilities of choosing each terrain type in the order presented in terrain_types.
+           Args:
+                terrain_type (str): the terrain type to get the probabilities for
+        """
+        terrain_dict = self.transition_matrix.get(terrain)
+        probs = []
+        for terrain in self.terrain_types:
+            probs.append(terrain_dict[terrain])
+        return probs
+
 
 def check_probabilities():
     """A testing function which prints out the values of the sums of the transition matrix's probabilities.
@@ -96,51 +120,25 @@ def check_probabilities():
             sum += k
         print(sum)
 
-def get_probabilities(terrain_type):
-    """Returns a list of the probabilities of choosing each terrain type in the order presented in the TERRAIN_TYPES object.
-       Args:
-            terrain_type (str): the terrain type to get the probabilities for
-    """
-    terrain_dict = TRANSITION_MATRIX.get(terrain_type)
-    print(terrain_type)
-    probs = []
-    for terrain in TERRAIN_TYPES:
-        print(terrain_dict[terrain])
-        probs.append(terrain_dict[terrain])
-    return probs
-
-def get_first_point(): # TODO rename to terrain, not point?
-    """Chooses a random terrain type to start with. Returns the name of the terrain type as a string."""
-    first_point = numpy.random.choice(TERRAIN_TYPES)
-    return first_point
-
-def get_next_point(current_point):
-    """Chooses the next terrain type that will be drawn on the map based on the probablities provided by the transition matrix.
-       Returns the name as a string.
-       Args:
-            current_point (str): the name of the terrain type to be transitioned from
-    """
-    next_point = numpy.random.choice(TERRAIN_TYPES, p=get_probabilities(current_point))
-    print(next_point)
-    return next_point
-
 def main():
     # TODO make background an old map. maybe add an image? add a border?
-    
-    # set up window
+    print("Generating map ...")
+
+    # set up image
     img = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT))
     imgdraw = ImageDraw.Draw(img)
-    
-    current_point = get_first_point()
 
-    for x in range(IMAGE_WIDTH+1):
-        for y in range(IMAGE_HEIGHT+1):
-            next_point = get_next_point(current_point)
-            next_point_color = MAP_COLORS[next_point]
-            imgdraw.point([(x,y)], fill=next_point_color)
-            current_point = next_point
+    map_generator = MapGenerator(TRANSITION_MATRIX)
 
-    img.save("images/image.png")
+    for x in range(0, IMAGE_WIDTH, 4):
+        for y in range(0, IMAGE_HEIGHT, 4):
+            next_terrain_color = MAP_COLORS[map_generator.current_terrain]
+            imgdraw.rectangle([(x,y), (x+GRID_SIZE, y+GRID_SIZE)], fill=next_terrain_color)
+            map_generator.get_next_terrain()
+
+    img.save("test_images/image.png")
+
+    print("Done!")
 
 if __name__ == "__main__":
     main()
