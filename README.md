@@ -7,9 +7,15 @@ My code generates a pixel art map using a Markov model. I intended for this to b
 ## Color key
 
 Green = grass
+
+Dark green = forest
+
 Yellow = sand
+
 Blue = water
+
 Light gray = low mountain
+
 Dark gray = high mountain
 
 ## How to run
