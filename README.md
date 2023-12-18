@@ -22,7 +22,7 @@ Dark gray = high mountain
 
 ## How to run
 
-You can run the main file normally, either through an IDE or the terminal. A file will be generated to the following path: "test_images/image.png" with the resulting image. If you want to keep this file, either rename it or move it elsewhere on your device. Otherwise, the file will be rewritten next time the program is run.
+You can run the main file normally, either through an IDE or the terminal. A file will be generated to the following path: "images/image.png" with the resulting image. If you want to keep this file, either rename it or move it elsewhere on your device. Otherwise, the file will be rewritten next time the program is run.
 
 ## The future
 

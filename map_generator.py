@@ -100,7 +100,6 @@ class MapGenerator:
         if self.current_x == 0:
             # we can just use the base probabilities for the first column, since there are no filled in pixels to the left
             next_terrain = numpy.random.choice(self.terrain_types, p=self.get_probabilities(self.current_terrain))
-            # WHEN STARTING A NEW COLUMN, DON'T RELY ON CURRENT_TERRAIN TO DECIDE NEW TERRAIN TODO
         else:
             # past the first column, we want to average the probabilities from the current pixel (before) and the pixel to the left
             new_probabilities = self.get_new_probabilities()
@@ -148,9 +147,8 @@ class MapGenerator:
 
                 # no overlap between the two terrain types. prioritize current_terrain
                 new_probs = probs_before
-                # TODO make it randomly choose one
             else:
-                # anything that is a 0% chance for one of the terrains but not for the other will be a 0% chance in the new probabilities TODO word this better
+                # anything that is a 0% chance for one of the terrains but not for the other will be a 0% chance in the new probabilities
                 for i in range(len(new_probs)):
                     if new_probs[i] != 0:
                         new_probs[i] += leftover/num_non_zeroes # sand and hm have no overlap: probs will be all 0s
@@ -163,7 +161,7 @@ class MapGenerator:
                 return t
         return None
     
-    def generate_map(self, image_name): # TODO let it take image size as param - have to make sure edges ok if not divisible by GRID_SIZE
+    def generate_map(self, image_name):
         
         for x in range(0, IMAGE_WIDTH, GRID_SIZE):
             self.current_x = x
@@ -172,31 +170,18 @@ class MapGenerator:
                 current_pixel_color = self.img.getpixel((x+1,y+1))
                 if current_pixel_color[0] == current_pixel_color[1] == current_pixel_color[2] == 0: # if the current pixel hasn't been filled yet
                     next_terrain_color = MAP_COLORS[self.current_terrain]
-                    rand_int_x = numpy.random.randint(1, 2)
-                    rand_int_y = numpy.random.randint(1, 2) # TODO currently, these two variables do nothing. They roll a 1 every time. Just here for testing purposes.
-                    self.imgdraw.rectangle([(x,y), (x+(GRID_SIZE*rand_int_x), y+(GRID_SIZE*rand_int_y))], fill=next_terrain_color)
+                    self.imgdraw.rectangle([(x,y), (x+(GRID_SIZE), y+(GRID_SIZE))], fill=next_terrain_color)
                     self.get_next_terrain()
                 
-                self.img.save(image_name) # TODO take this out. just here for testing purposes
+                self.img.save(image_name)
 
         self.img.save(image_name)
 
 
-def check_probabilities(probs):
-    """A testing function which prints out the value of the sum a list of probabilities.
-       Each sum should end up being equal to 1.0.
-    """
-    # TODO delete this later
-    sum = 0
-    for i in probs:
-        sum += i
-    print(sum)
-
 def main():
-    # TODO make background an old map. maybe add an image? add a border?
     print("Generating map...")
     map_generator = MapGenerator(TRANSITION_MATRIX)
-    map_generator.generate_map("test_images/image.png") # TODO change default destination
+    map_generator.generate_map("images/image.png")
     print("Done!")
 
 if __name__ == "__main__":
