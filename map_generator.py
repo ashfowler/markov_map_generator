@@ -172,8 +172,6 @@ class MapGenerator:
                     next_terrain_color = MAP_COLORS[self.current_terrain]
                     self.imgdraw.rectangle([(x,y), (x+(GRID_SIZE), y+(GRID_SIZE))], fill=next_terrain_color)
                     self.get_next_terrain()
-                
-                self.img.save(image_name)
 
         self.img.save(image_name)
 
